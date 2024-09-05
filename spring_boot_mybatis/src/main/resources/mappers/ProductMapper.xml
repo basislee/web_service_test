@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.spring_boot_mybatis.project.dao.IProductDAO">
+  	<resultMap id="prdResult" type="com.spring_boot_mybatis.project.model.ProductVO" >
+  		<result property="prdNo" column="prdNo"  />
+  		<result property="prdName" column="prdName"  />
+  		<result property="prdPrice" column="prdPrice"  />
+  		<result property="prdCompany" column="prdCompany"  />
+  		<result property="prdStock" column="prdStock"  />
+  		<result property="prdDate" column="prdDate"  />
+  	</resultMap>
+  	
+  	<!-- 전체 상품 조회 --> <!-- id는 IProdudctDAO의 메소드 이름과 동일해야 함 -->
+  	<select id="listAllProduct" resultMap="prdResult">
+  		SELECT * FROM product ORDER BY prdNo
+  	</select>
+  	
+  	<!-- 상품 등록 --> 
+  	<!-- 모든 필드에 저장하는 경우에는(prdNo, prdName, prdPrice, prdCompany, prdStock, prdDate) 생략 가능 -->
+  	<insert id="insertProduct" parameterType="com.spring_boot_mybatis.project.model.ProductVO">
+  		INSERT INTO product (prdNo, prdName, prdPrice, prdCompany, prdStock, prdDate)
+  		VALUES(#{prdNo}, #{prdName}, #{prdPrice}, 
+  					   #{prdCompany}, #{prdStock}, #{prdDate})  		
+  	</insert>
+  	
+  	<!-- 상품 상세 정보 조회 -->
+  	<!-- 상품번호(string) 전달받아서 해당 상품 찾아서 반환 (VO) -->
+  	<select id="detailViewProduct" parameterType="string"
+  				  resultType="com.spring_boot_mybatis.project.model.ProductVO">
+  		SELECT * FROM product WHERE prdNo = #{prdNo}
+  	</select>
+  	
+  	<!-- 상품 정보 수정 : 수정된 데이터 DB에서 update(저장)  -->
+  	<!-- 주의!!! : 기본키인 상품번호는 수정 안 함 -->
+  	<update id="updateProduct">
+  		UPDATE product SET prdName=#{prdName}, prdPrice=#{prdPrice},
+  					   prdCompany=#{prdCompany}, prdStock=#{prdStock},
+  					   prdDate=#{prdDate}
+  		WHERE prdNo=#{prdNo}
+  	</update>
+  	
+  	<!--  상품 정보 삭제 -->
+  	<!-- 파라미터로 상품번호 전달 받음 -->
+  	<delete id="deleteProduct" parameterType="string">
+  		DELETE FROM product WHERE prdNo=#{prdNo}
+  	</delete>
+  	
+  	<!-- 상품번호 중복 확인 -->
+  	<select id="prdNoCheck" parameterType="string" resultType="string">
+  		SELECT prdNo FROM product WHERE prdNo=#{prdNo}
+  		<!-- 해당 번호가 존재한다면 상품번호 반환, 아니면 null 값 반환 -->
+  	</select>
+  	
+  	<!--  상품 검색 -->
+  	<select id="productSearch" parameterType="hashmap" resultMap="prdResult">
+  		SELECT * FROM product WHERE
+  			<choose>
+  				<when test="type != null and type.equals('prdName')">
+  					prdName LIKE CONCAT('%', #{keyword}, '%')
+  				</when>
+  				<when test="type != null and type.equals('prdCompany')">
+  					prdCompany LIKE CONCAT('%', #{keyword}, '%')
+  				</when>
+  			</choose>
+  	</select>
+  </mapper>
+  
+  
+  
+  
+  
+  
+  
+  
